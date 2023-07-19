@@ -1,1 +1,36 @@
+#2. Count how many articles about Justin Trudeau have been posted since 01.01.2018 until today:
+#The output should consist of two columns: „Date“ and „No. of articles“
+#2018-01-01 3
+#2018-01-02 4
+#2018-01-03 2
+
+
+import pandas as pd
+
+# Excel-Datei einlesen und DataFrame erstellen
+df = pd.read_excel('./datengesamt-2.xlsx')
+
+
+
+# Datumsangaben in eine pandas-Serie konvertieren
+dates = pd.to_datetime(df['DatumKurz'])
+
+# Datumsangaben filtern, die seit 2018 gleich sind
+start_date = pd.Timestamp(2018, 1, 1)
+
+filtered_dates = dates[dates >= start_date]
+
+# Tägliche Häufigkeiten der gleichartigen Datumsangaben zählen
+daily_counts = filtered_dates.groupby(filtered_dates.dt.date).size()
+
+
+Ergebnis = pd.DataFrame({'"Date"': daily_counts.index, '„No. of articles“': daily_counts.values})
+
+# Excel Export
+Ergebnis.to_excel('Artikel_Datum_Histogram.xlsx', index=False)
+
+
+# Ergebnis anzeigen
+print(Ergebnis)
+
 
