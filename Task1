@@ -1,3 +1,7 @@
+#1. Extract information about Justin Trudeau.
+
+
+
 import requests
 import pandas as pd
 
