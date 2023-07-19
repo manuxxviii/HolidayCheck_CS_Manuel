@@ -6,6 +6,8 @@
 
 
 import pandas as pd
+import numpy as np
+import matplotlib.pyplot as plt
 
 # Excel-Datei einlesen und DataFrame erstellen
 df = pd.read_excel('./datengesamt-2.xlsx')
@@ -23,8 +25,18 @@ filtered_dates = dates[dates >= start_date]
 # Tägliche Häufigkeiten der gleichartigen Datumsangaben zählen
 daily_counts = filtered_dates.groupby(filtered_dates.dt.date).size()
 
+mean = np.mean(daily_counts)
+
 
 Ergebnis = pd.DataFrame({'"Date"': daily_counts.index, '„No. of articles“': daily_counts.values})
+
+#Hier Diagramm
+plt.bar(daily_counts.index, daily_counts.values)
+plt.title('Balkendiagramm')
+plt.xlabel('Dates')
+plt.ylabel('No. of articles')
+
+plt.show()
 
 # Excel Export
 Ergebnis.to_excel('Artikel_Datum_Histogram.xlsx', index=False)
@@ -32,5 +44,4 @@ Ergebnis.to_excel('Artikel_Datum_Histogram.xlsx', index=False)
 
 # Ergebnis anzeigen
 print(Ergebnis)
-
-
+print(mean)
