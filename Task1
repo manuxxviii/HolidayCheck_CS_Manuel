@@ -1,0 +1,40 @@
+import requests
+import pandas as pd
+
+url = "https://content.guardianapis.com/search"
+api_key = "43b6b5e0-3b98-497a-a16c-5dfb651e8da9"  # der erste ging plötlich nicht mehr c8d07519-7021-4356-a55e-52aec21db8b3
+params = {
+    "api-key": api_key,
+    "q": "Justin Trudeau",  # Suchbegriff oder Kategorie angeben
+    "format": "json",  
+    "page-size": 200  # Man kann max 200 Pages abrufen; daher je Abfrage Max
+}
+
+all_results = []  # Leere Liste zum speichern der Zwischenergebnisse
+total_pages = 0
+
+# Prüfung wie viele pages max vorhanden sind 
+response = requests.get(url, params=params)
+if response.status_code == 200:
+    data = response.json()
+    total_pages = data["response"]["pages"]
+else:
+    print("Fehler in Prüfung der Seiten")
+
+# hier zweiter Versuch jeweils die Seiten abzufragen und dann die Daten Zwischenzuspeichern
+for page in range(1, total_pages + 1):
+    params["page"] = page
+    response = requests.get(url, params=params)
+    if response.status_code == 200:
+        data = response.json()
+        results = data["response"]["results"]
+        all_results.extend(results)  # Ergebnisse zur Gesamtliste hinzufügen
+    else:
+        print("Fehler beim Abrufen der Daten von der API:1", response.status_code)
+
+# DataFrame mit Pandas zur besseren Darstellung und dann Export nach excel. 
+df = pd.DataFrame(all_results)
+
+# Excel Export
+df.to_excel('datengesamt.xlsx', index=False)
+
