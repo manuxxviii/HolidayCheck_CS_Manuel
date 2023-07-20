@@ -34,7 +34,7 @@ for page in range(1, total_pages + 1):
         results = data["response"]["results"]
         all_results.extend(results)  # Zwischenergebnisse in eine Datengesamtliste speichern
     else:
-        print("Fehler beim Abrufen der Daten von der API:1", response.status_code)
+        print("Fehler beim Abrufen der einzelnen Seiten")
 
 # DataFrame mit Pandas für 2Dim Datendarstellung und dann Export nach excel. 
 df = pd.DataFrame(all_results)
