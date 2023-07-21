@@ -1,0 +1,151 @@
+import pandas as pd
+import numpy as np
+import matplotlib.pyplot as plt
+from datetime import datetime
+
+# Excel-Datei einlesen und DataFrame erstellen
+df = pd.read_excel('./datengesamt-3_Trudeau.xlsx')
+
+
+
+
+# Datumsangaben in eine pandas-Serie konvertieren
+dates = pd.to_datetime(df['Date'])
+
+# Datumsangaben filtern, die seit 2018 gleich sind
+start_date = pd.Timestamp(2018, 1, 1)
+
+
+filtered_dates = dates[dates >= start_date]
+
+# Tägliche Häufigkeiten der gleichartigen Datumsangaben zählen
+daily_counts = filtered_dates.groupby(filtered_dates.dt.date).size()
+
+mean = round(np.mean(daily_counts), 4) #gerundet auf 4 Nachkommastellen
+summe = np.sum(daily_counts)
+summe_dates = np.sum(daily_counts)
+
+Ergebnis = pd.DataFrame({'"Date"': daily_counts.index, '„No. of articles“': daily_counts.values})
+
+
+
+
+
+#Berechnung aller Tage ab bestimmten Startdatum
+end_date = '2023-07-20'
+end_date = datetime.strptime(end_date, '%Y-%m-%d')
+
+delta_tage = end_date - start_date
+az_tage = delta_tage.days
+
+
+mean2 = round(az_tage / summe_dates, 4) #gerundet auf 4 NKS; Durschnitt 2 mit AZ Gesamttage
+
+
+
+#Ermittlung in welcher Rubrik die meisten Artikel veröffentlicht wurden
+
+rubrik_anzahl = df['sectionId'].value_counts() #Häufigkeit Rubrik
+rubrik_ohne_duplikate = df['sectionId'].nunique() #Duplikate in sectionId entfernt
+
+plt.bar(rubrik_anzahl.index, rubrik_anzahl.values)
+plt.title('Häufigkeiten aller Rubriken')
+plt.xlabel('Rubrik')
+plt.ylabel('Häufigkeit')
+plt.xticks(rotation=90, fontsize=10)
+
+#plt.show()
+
+
+"""
+#Hier Diagramm Entwicklung der AZ der Artikel über die Zeit
+plt.figure(figsize=(10, 6)) #Breiter, da schlecht lesbar
+plt.bar(daily_counts.index, daily_counts.values, width=3)
+plt.title('AZ veröffentlichte Artikel über Zeit')
+plt.xlabel('Dates')
+plt.ylabel('No. of articles')
+plt.ylim(0, 14) #Höchste AZ artikel 13
+plt.show()
+
+plt.tight_layout()
+plt.show()
+
+
+
+
+#Entwicklung der veröffentlichten Artikel kumuliert
+df['Artikel_Kumuliert'] = Ergebnis['„No. of articles“'].cumsum()
+plt.plot(df.index, df['Artikel_Kumuliert'])
+plt.title('Anzahl veröffentlichte Artikel über Zeit kumuliert')
+plt.xlabel('Anzahl veröffentlichte Tage')
+plt.ylabel('Artikel')
+
+"""
+
+#Anzahl Artkel absteigend sortiern
+
+dfs = pd.DataFrame(Ergebnis)
+dfs['"Date"'] = pd.to_datetime(dfs['"Date"'])
+
+dfs_sortiert = dfs.sort_values(by=['„No. of articles“', '"Date"'], ascending=[False, False])
+
+
+#print(dfs_sortiert.head(20))
+
+
+#Artikel zu Datum ausgeben
+artikeldatum = '2018-06-11'
+artikeltitel = df[df['Date'] == artikeldatum]['webTitle']
+
+#print(f"Artikel am {artikeldatum}:")
+#print(artikeltitel)
+
+
+
+
+
+#Statistische Identifizierung der Ausreißer mit dem Z-Score
+df3 = pd.DataFrame(Ergebnis)
+
+#threshold : Schwellenwert wie weit Datenpunkt von durchschn. Schwankung entfernt sein muss, um als Ausreisser identifiziert zu werden. Hoher Schwellenwert, desto strenger werden Ausreißer identifiziert
+def identifizierung_ausreisser(series, threshold=5): #Fuktion für Identi. der Ausreißer mit Z-Wert
+    mean3 = series.mean()
+    std = series.std()
+    z_scores =(series - mean3) / std
+    ausreisser = z_scores.abs() > threshold
+    return ausreisser
+
+#Ausreißer in der Artikelspalte
+
+ausreisser_artikel = identifizierung_ausreisser(df3['„No. of articles“'])
+
+print("Ausreisser")
+print(df3.loc[ausreisser_artikel])
+
+#Ausreisser grafisch darstellen
+plt.figure(figsize=(10, 6))
+plt.scatter(df3['"Date"'], df3['„No. of articles“'], label='Datenpunkte', color='blue')
+plt.scatter(df3['"Date"'][ausreisser_artikel], df3['„No. of articles“'][ausreisser_artikel], label='Ausreißer', color='red', marker='x')
+plt.xlabel('Datum')
+plt.ylabel('„No. of articles“')
+plt.title('Ausreißer in der Anzahl')
+plt.legend()
+plt.show()
+
+
+
+
+
+# Excel Export
+Ergebnis.to_excel('Artikel_Datum_Histogram.xlsx', index=False)
+
+
+# Ergebnisse anzeigen
+#print(Ergebnis)
+#print(mean)
+#print(summe)
+#print("Anzahl der Tage seit ",start_date,":", az_tage ,"Tage")
+#print("Summe No. of articles:", summe_dates)
+#print("Durchschnitt 2:",mean2)
+#print(rubrik_anzahl)
+#print("Anzahl Rubriken ohne Duplikate:", rubrik_ohne_duplikate)
