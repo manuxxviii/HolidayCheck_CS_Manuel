@@ -57,7 +57,7 @@ plt.xticks(rotation=90, fontsize=10)
 #plt.show()
 
 
-"""
+
 #Hier Diagramm Entwicklung der AZ der Artikel über die Zeit
 plt.figure(figsize=(10, 6)) #Breiter, da schlecht lesbar
 plt.bar(daily_counts.index, daily_counts.values, width=3)
@@ -80,7 +80,7 @@ plt.title('Anzahl veröffentlichte Artikel über Zeit kumuliert')
 plt.xlabel('Anzahl veröffentlichte Tage')
 plt.ylabel('Artikel')
 
-"""
+
 
 #Anzahl Artkel absteigend sortiern
 
@@ -90,7 +90,7 @@ dfs['"Date"'] = pd.to_datetime(dfs['"Date"'])
 dfs_sortiert = dfs.sort_values(by=['„No. of articles“', '"Date"'], ascending=[False, False])
 
 
-#print(dfs_sortiert.head(20))
+print(dfs_sortiert.head(20))
 
 
 #Artikel zu Datum ausgeben
@@ -141,11 +141,12 @@ Ergebnis.to_excel('Artikel_Datum_Histogram.xlsx', index=False)
 
 
 # Ergebnisse anzeigen
-#print(Ergebnis)
-#print(mean)
-#print(summe)
-#print("Anzahl der Tage seit ",start_date,":", az_tage ,"Tage")
-#print("Summe No. of articles:", summe_dates)
-#print("Durchschnitt 2:",mean2)
-#print(rubrik_anzahl)
-#print("Anzahl Rubriken ohne Duplikate:", rubrik_ohne_duplikate)
+print(Ergebnis)
+print(mean)
+print(summe)
+print("Anzahl der Tage seit ",start_date,":", az_tage ,"Tage")
+print("Summe No. of articles:", summe_dates)
+print("Durchschnitt 2:",mean2)
+print(rubrik_anzahl)
+print("Anzahl Rubriken ohne Duplikate:", rubrik_ohne_duplikate)
+
